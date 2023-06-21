@@ -47,9 +47,8 @@ class _HomePageState extends State<HomePage> {
 
   setCartData(cart) async {
     List<String> cartList =
-    cart.map((item) => jsonEncode(item.toMap())).toList();
-    sharedPreferences?.setStringList("cart",
-        cartList.cast<String>());
+        cart.map((item) => jsonEncode(item.toMap())).toList();
+    sharedPreferences?.setStringList("cart", cartList.cast<String>());
     getCartData();
   }
 
@@ -65,8 +64,10 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
   loadSharedPreferences() async {
-    sharedPreferences = await SharedPreferences.getInstance(); //Instantiating the object of SharedPreferences class.
+    sharedPreferences = await SharedPreferences
+        .getInstance(); //Instantiating the object of SharedPreferences class.
   }
 
   @override
@@ -177,201 +178,148 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      backgroundColor: appBarBackgroundColor,
-      appBar: mainAppBar(
-          'HomePage',
-          () => Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) =>
-                        CartPage(cartList: _cart, optionItems: optionItems)),
-              ),
-          _cart.length),
-      body: SingleChildScrollView(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(height: 12),
-        Padding(
-          padding: EdgeInsets.only(
-            left: 15,
-            right: 15,
-            top: 15,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 150.0,
-                  viewportFraction: 1,
-                  autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 4),
-                  autoPlayAnimationDuration: Duration(milliseconds: 800),
-                  enlargeCenterPage: false,
-                ),
-                carouselController: _controller,
-                items: imgList
-                    .map((item) => Container(
-                          child: Center(
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  item.toString(),
-                                  fit: BoxFit.cover,
-                                  width: 1000,
-                                )),
-                          ),
-                        ))
-                    .toList(),
-              ),
-              SizedBox(height: 20),
-              Text('Trending Products', style: homePageTextStyle),
-              SizedBox(height: 18),
-              GridView.builder(
-                itemCount: optionItems.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisExtent: 168,
-                  mainAxisSpacing: 12,
-                ),
-                itemBuilder: (BuildContext context, int index) => InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
+        child: RefreshIndicator(
+            onRefresh: () async {
+              getCartData();
+            },
+            color: greenButtonColor,
+            child: Scaffold(
+            backgroundColor: appBarBackgroundColor,
+            appBar: mainAppBar(
+                'HomePage',
+                () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ProductDetail(
-                            optionItems[index].image,
-                            optionItems[index].name,
-                            optionItems[index].price,
-                            optionItems[index].desc,
-                            optionItems[index].spec),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Flexible(
-                        child: Container(
-                          // height: 200,
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            border: Border.all(color: borderColor, width: 0.5),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(12),
-                            ),
+                          builder: (context) => CartPage(
+                              cartList: _cart, optionItems: optionItems)),
+                    ),
+                _cart.length),
+            body: SingleChildScrollView(
+              child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 12),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 15,
+                            right: 15,
+                            top: 15,
                           ),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 7),
-                              Image.network(
-                                optionItems[index].image,
-                                height: 75, width: 82,
-                                // fit: BoxFit.fill
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: Text(optionItems[index].name,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: productListText,
-                                      textAlign: TextAlign.center),
+                              CarouselSlider(
+                                options: CarouselOptions(
+                                  height: 150.0,
+                                  viewportFraction: 1,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 4),
+                                  autoPlayAnimationDuration:
+                                      Duration(milliseconds: 800),
+                                  enlargeCenterPage: false,
                                 ),
+                                carouselController: _controller,
+                                items: imgList
+                                    .map((item) => Container(
+                                          child: Center(
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                child: Image.network(
+                                                  item.toString(),
+                                                  fit: BoxFit.cover,
+                                                  width: 1000,
+                                                )),
+                                          ),
+                                        ))
+                                    .toList(),
                               ),
-                              Text('₹ ${optionItems[index].price}',
-                                  style: productListText),
-                              SizedBox(height: 8),
-                              _isItemExistInCart(optionItems[index].id) == true
-                                  ? Column(
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Container(
-                                            padding: EdgeInsets.only(
-                                                left: 7, right: 7),
-                                            width: double.infinity,
-                                            height: 23.0,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (_) => CartPage(
-                                                            cartList: _cart,
-                                                            optionItems:
-                                                                optionItems)));
-                                              },
-                                              child: Text('Go to Cart',
-                                                  style:
-                                                      addedProductListButton),
-                                              style: OutlinedButton.styleFrom(
-                                                backgroundColor:
-                                                    greenButtonColor,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                side: BorderSide(
-                                                    width: 0.7,
-                                                    color: greenButtonColor),
-                                              ),
+                              SizedBox(height: 20),
+                              Text('Trending Products',
+                                  style: homePageTextStyle),
+                              SizedBox(height: 18),
+                              GridView.builder(
+                                itemCount: optionItems.length,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisExtent: 168,
+                                  mainAxisSpacing: 12,
+                                ),
+                                itemBuilder:
+                                    (BuildContext context, int index) =>
+                                        InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetail(
+                                            optionItems[index].image,
+                                            optionItems[index].name,
+                                            optionItems[index].price,
+                                            optionItems[index].desc,
+                                            optionItems[index].spec),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Flexible(
+                                        child: Container(
+                                          // height: 200,
+                                          decoration: BoxDecoration(
+                                            color: whiteColor,
+                                            border: Border.all(
+                                                color: borderColor, width: 0.5),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(12),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          height: 18,
-                                        )
-                                      ],
-                                    )
-                                  : Column(
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Container(
-                                            padding: EdgeInsets.only(
-                                                left: 7, right: 7),
-                                            width: double.infinity,
-                                            height: 23.0,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                _addToCart(
-                                                    optionItems[index].id);
-                                                final snackBar = SnackBar(
-                                                  duration: const Duration(
-                                                      seconds: 1),
-                                                  backgroundColor:
-                                                      greenButtonColor,
-                                                  content: SizedBox(
-                                                    height: 40,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(height: 7),
+                                              Image.network(
+                                                optionItems[index].image,
+                                                height: 75, width: 82,
+                                                // fit: BoxFit.fill
+                                              ),
+                                              Expanded(
+                                                child: Center(
+                                                  child: Text(
+                                                      optionItems[index].name,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: productListText,
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                ),
+                                              ),
+                                              Text(
+                                                  '₹ ${optionItems[index].price}',
+                                                  style: productListText),
+                                              SizedBox(height: 8),
+                                              _isItemExistInCart(
+                                                          optionItems[index]
+                                                              .id) ==
+                                                      true
+                                                  ? Column(
                                                       children: [
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              '1 Item in cart',
-                                                              style: addToCart,
-                                                            ),
-                                                            Text(
-                                                              '₹ ' +
-                                                                  optionItems[
-                                                                          index]
-                                                                      .price,
-                                                              style:
-                                                                  addCartPrice,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            InkWell(
-                                                              child: Text(
-                                                                  'View Cart',
-                                                                  style:
-                                                                      addCartView),
-                                                              onTap: () {
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: Container(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 7,
+                                                                    right: 7),
+                                                            width:
+                                                                double.infinity,
+                                                            height: 23.0,
+                                                            child:
+                                                                OutlinedButton(
+                                                              onPressed:
+                                                                  () async {
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
@@ -381,102 +329,207 @@ class _HomePageState extends State<HomePage> {
                                                                             optionItems:
                                                                                 optionItems)));
                                                               },
+                                                              child: Text(
+                                                                  'Go to Cart',
+                                                                  style:
+                                                                      addedProductListButton),
+                                                              style:
+                                                                  OutlinedButton
+                                                                      .styleFrom(
+                                                                backgroundColor:
+                                                                    greenButtonColor,
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8),
+                                                                ),
+                                                                side: BorderSide(
+                                                                    width: 0.7,
+                                                                    color:
+                                                                        greenButtonColor),
+                                                              ),
                                                             ),
-                                                            SizedBox(width: 5),
-                                                            // icon-1
-                                                            Icon(
-                                                              Icons
-                                                                  .arrow_forward_ios,
-                                                              size: 11,
-                                                              color: whiteColor,
-                                                            ),
-                                                          ],
+                                                          ),
                                                         ),
+                                                        SizedBox(
+                                                          height: 18,
+                                                        )
                                                       ],
-                                                    ),
-                                                  ),
-                                                );
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(snackBar);
-                                              },
-                                              child: Text('Add to Cart',
-                                                  style: productListButton),
-                                              style: OutlinedButton.styleFrom(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                side: BorderSide(
-                                                    width: 0.7,
-                                                    color: greenButtonColor),
-                                              ),
-                                            ),
+                                                    )
+                                                  : Column(
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: Container(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 7,
+                                                                    right: 7),
+                                                            width:
+                                                                double.infinity,
+                                                            height: 23.0,
+                                                            child:
+                                                                OutlinedButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                _addToCart(
+                                                                    optionItems[
+                                                                            index]
+                                                                        .id);
+                                                                final snackBar =
+                                                                    SnackBar(
+                                                                  duration:
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              1),
+                                                                  backgroundColor:
+                                                                      greenButtonColor,
+                                                                  content:
+                                                                      SizedBox(
+                                                                    height: 40,
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Column(
+                                                                          children: [
+                                                                            Text(
+                                                                              '1 Item in cart',
+                                                                              style: addToCart,
+                                                                            ),
+                                                                            Text(
+                                                                              '₹ ' + optionItems[index].price,
+                                                                              style: addCartPrice,
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            InkWell(
+                                                                              child: Text('View Cart', style: addCartView),
+                                                                              onTap: () {
+                                                                                Navigator.push(context, MaterialPageRoute(builder: (_) => CartPage(cartList: _cart, optionItems: optionItems)));
+                                                                              },
+                                                                            ),
+                                                                            SizedBox(width: 5),
+                                                                            // icon-1
+                                                                            Icon(
+                                                                              Icons.arrow_forward_ios,
+                                                                              size: 11,
+                                                                              color: whiteColor,
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                        snackBar);
+                                                              },
+                                                              child: Text(
+                                                                  'Add to Cart',
+                                                                  style:
+                                                                      productListButton),
+                                                              style:
+                                                                  OutlinedButton
+                                                                      .styleFrom(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8),
+                                                                ),
+                                                                side: BorderSide(
+                                                                    width: 0.7,
+                                                                    color:
+                                                                        greenButtonColor),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 18,
+                                                        )
+                                                      ],
+                                                    )
+                                            ],
                                           ),
                                         ),
-                                        SizedBox(
-                                          height: 18,
-                                        )
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 17),
+                              Image.asset('assets/images/offer_image.png'),
+                              SizedBox(height: 15),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 40),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/icon-fresh.png',
+                                            height: 44),
+                                        SizedBox(height: 5),
+                                        Text('100%', style: homeIconTextStyle),
+                                        Text('Natural',
+                                            style: homeIconTextStyle),
                                       ],
-                                    )
+                                    ),
+                                    Column(
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/icon-healthy.png',
+                                            height: 44),
+                                        SizedBox(height: 5),
+                                        Text('Healthy',
+                                            style: homeIconTextStyle),
+                                        Text('Cooking',
+                                            style: homeIconTextStyle),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/icon-natural.png',
+                                            height: 44),
+                                        SizedBox(height: 5),
+                                        Text('Always',
+                                            style: homeIconTextStyle),
+                                        Text('Fresh', style: homeIconTextStyle),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/icon-quality.png',
+                                            height: 44),
+                                        SizedBox(height: 5),
+                                        Text('Best', style: homeIconTextStyle),
+                                        Text('Quality',
+                                            style: homeIconTextStyle),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 17),
-              Image.asset('assets/images/offer_image.png'),
-              SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 40),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Image.asset('assets/images/icon-fresh.png', height: 44),
-                        SizedBox(height: 5),
-                        Text('100%', style: homeIconTextStyle),
-                        Text('Natural', style: homeIconTextStyle),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.asset('assets/images/icon-healthy.png',
-                            height: 44),
-                        SizedBox(height: 5),
-                        Text('Healthy', style: homeIconTextStyle),
-                        Text('Cooking', style: homeIconTextStyle),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.asset('assets/images/icon-natural.png',
-                            height: 44),
-                        SizedBox(height: 5),
-                        Text('Always', style: homeIconTextStyle),
-                        Text('Fresh', style: homeIconTextStyle),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.asset('assets/images/icon-quality.png',
-                            height: 44),
-                        SizedBox(height: 5),
-                        Text('Best', style: homeIconTextStyle),
-                        Text('Quality', style: homeIconTextStyle),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ])),
-    ));
+                      ])),
+            )));
   }
 
   _isItemExistInCart(id) {

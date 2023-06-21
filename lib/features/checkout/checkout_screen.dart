@@ -56,7 +56,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   openCheckout() async {
     var options = {
-      'key': 'rzp_test_tIRt2p3xnzZbOc',
+      'key': 'test key',
       'amount': amount(),
       // 'order_id': orderId,
       'currency': 'INR',
@@ -205,7 +205,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           BorderRadius.all(Radius.circular(7))),
                                 ),
                                 onPressed: () {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                           builder: (_) => AddAddress(widget.cartList,widget.optionItems)));
