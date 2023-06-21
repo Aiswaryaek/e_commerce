@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable
+// ignore_for_file: prefer_const_constructors, must_be_immutable, sort_child_properties_last, prefer_is_empty
 
 import 'dart:convert';
 
 import 'package:e_commerce/styles/colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cart_model.dart';
@@ -41,31 +42,22 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  void _addToCart(id) {
-    dynamic index = widget.cartList.indexWhere((item) => item.id == id);
-    if (index != -1) {
-      widget.cartList[index].qty = (widget.cartList[index].qty! + 1);
-    } else {
-      widget.cartList.add(Cart(id: id, qty: 1));
-    }
+  void _addQuantity(id) {
+    final index = widget.cartList.indexWhere((element) => element.id == id);
     setState(() {
-      widget.cartList = widget.cartList;
+      widget.cartList[index].qty = (widget.cartList[index].qty! + 1);
     });
-    setCartData(widget.cartList);
   }
 
-  void _removeFromCart(id) {
-    dynamic index = widget.cartList.indexWhere((item) => item.id == id);
-    if (index != -1) {
-      if (widget.cartList[index].qty! > 1) {
-        widget.cartList[index].qty = (widget.cartList[index].qty! - 1);
-      } else {
-        widget.cartList.removeWhere((item) => item.id == id);
-      }
+  void _removeQuantity(id) {
+    final index = widget.cartList.indexWhere((element) => element.id == id);
+    final currentQuantity = widget.cartList[index].qty;
+    if (currentQuantity! <= 1) {
+      currentQuantity == 1;
+    } else {
       setState(() {
-        widget.cartList = widget.cartList;
+        widget.cartList[index].qty = currentQuantity - 1;
       });
-      setCartData(widget.cartList);
     }
   }
 
@@ -109,7 +101,9 @@ class _CartPageState extends State<CartPage> {
                 appBar(context, 'Shopping Cart', () => Navigator.pop(context)),
             body: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: Card(
+              child: widget.cartList.length == 0?SizedBox(height: MediaQuery.of(context).size.height / 1.3,
+                child: Center(child: Text('Your cart is empty 🥲',style: dialogConfirmTextStyle,),),
+              ):Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(6)),
                 ),
@@ -175,7 +169,7 @@ class _CartPageState extends State<CartPage> {
                                               child: Icon(Icons.remove,
                                                   color: whiteColor, size: 16),
                                               onTap: () {
-                                                _removeFromCart(widget.cartList[index].id);
+                                                _removeQuantity(widget.cartList[index].id);
                                               },
                                             ),
                                           ),
@@ -188,8 +182,7 @@ class _CartPageState extends State<CartPage> {
                                               child: Icon(Icons.add,
                                                   color: whiteColor, size: 16),
                                               onTap: () {
-                                                _addToCart(widget.cartList[index].id);
-                                                // widget.key.currentState._addToCart(widget.cartList[index].id);
+                                                _addQuantity(widget.cartList[index].id);
                                               },
                                             ),
                                           ),
@@ -208,10 +201,23 @@ class _CartPageState extends State<CartPage> {
                             padding: EdgeInsets.only(top: 10),
                             child: Transform.translate(
                               offset: Offset(-22, -6),
-                              child: Text(
-                                '₹ '  '${_getProductByField(widget.cartList[index].id, 'price')} Only/-',
-                                style: inrText,
-                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '₹ '  '${_getProductByField(widget.cartList[index].id, 'price')} Only/-',
+                                    style: inrText,
+                                  ),
+                                  InkWell(
+                                    onTap: (){onRemoveItem(index);},
+                                    child: Icon(
+                                      Icons.delete,
+                                      size: 20,
+                                      color: logoutColor,
+                                    ),
+                                  )
+                                ],
+                              )
                             ),
                           ),
                         ),
@@ -243,7 +249,7 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
             ),
-            bottomNavigationBar: Container(
+            bottomNavigationBar: widget.cartList.length == 0?SizedBox():Container(
               padding: EdgeInsets.all(20),
               child: Container(
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(12),
@@ -260,7 +266,7 @@ class _CartPageState extends State<CartPage> {
                 height: 45,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
+                    Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                           builder: (context) => CheckoutScreen(cartList:widget.cartList,optionItems: widget.optionItems,
                               '',
@@ -285,5 +291,41 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
             )));
+  }
+  onRemoveItem(index){
+    showCupertinoDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return CupertinoAlertDialog(
+            title:  Text('Confirm',style: dialogConfirmTextStyle,),
+            content:  Text('Do you want to remove this item?',style: splashSubtitleTextStyle,),
+            actions: [
+              // The "Yes" button
+              CupertinoDialogAction(
+                onPressed: () {
+                  setState(() {
+                    Navigator.of(context).pop();
+                  });
+                },
+                child:  Text('No',style: cancelTextStyle,),
+                isDefaultAction: true,
+                isDestructiveAction: true,
+              ),
+              // The "No" button
+              CupertinoDialogAction(
+                onPressed: () {
+                  setState(() {
+                    widget.cartList.indexWhere((element) => element.id == widget.optionItems[index]);
+                    widget.cartList.removeAt(index);
+                    Navigator.of(context).pop();
+                  });
+                },
+                child:  Text('Yes',style: logoutTextStyle,),
+                isDefaultAction: false,
+                isDestructiveAction: false,
+              )
+            ],
+          );
+        });
   }
 }

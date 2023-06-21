@@ -56,7 +56,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   openCheckout() async {
     var options = {
-      'key': 'test key',
+      'key': 'rzp_test_tIRt2p3xnzZbOc',
       'amount': amount(),
       // 'order_id': orderId,
       'currency': 'INR',
@@ -77,7 +77,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => OrderSuccess()));
-    Fluttertoast.showToast(msg: "Payment Success", timeInSecForIosWeb: 4);
+    widget.cartList.clear();
+    Fluttertoast.showToast(msg: "Payment Successful", timeInSecForIosWeb: 4);
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -276,7 +277,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 height: 45,
                 child: TextButton(
                   onPressed: () {
-                    openCheckout();
+                    widget.firstname==''?noAddressAdded():openCheckout();
                   },
                   style: TextButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -291,5 +292,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             )));
+  }
+  noAddressAdded(){
+    final snackBar = SnackBar(duration: const Duration(seconds: 1),
+      backgroundColor: greenButtonColor,
+      content: SizedBox(
+        height: 30,
+        child: Center(
+          child: Text(
+            'No address Added',
+            style: addToCart,
+          ),
+        )
+      ),
+    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(snackBar);
   }
 }

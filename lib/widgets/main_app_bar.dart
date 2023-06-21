@@ -24,10 +24,6 @@ AppBar mainAppBar(String text, VoidCallback callback,int cartLength) {
     backgroundColor: appBarBackgroundColor,
     title: Text(text, style: skipAppBar),
     centerTitle: true,
-    leading: Icon(
-      Icons.menu,
-      color: whiteColor,
-    ),
     actions: [
       Padding(
         padding: EdgeInsets.only(right: 16,top: 15),

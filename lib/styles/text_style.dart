@@ -81,6 +81,12 @@ TextStyle productListButton = TextStyle(
   color: greenButtonColor,
 );
 
+TextStyle addedProductListButton = TextStyle(
+  fontFamily: _primaryFont,
+  fontSize: 12,
+  color: whiteColor,
+);
+
 TextStyle skipAppBar = TextStyle(
   fontFamily: _secondaryFont,
   color: whiteColor,
@@ -163,4 +169,27 @@ TextStyle addressText = TextStyle(
   fontFamily: _primaryFont,
   fontSize: 14 ,
   color: blackColor,
+);
+TextStyle dialogConfirmTextStyle = TextStyle(
+  fontFamily: _secondaryFont,
+  color: skipAppBarColor,
+  fontSize: 15,
+);
+
+TextStyle splashSubtitleTextStyle = TextStyle(
+  fontFamily: _secondaryFont,
+  color: hintColor,
+  fontSize: 13,
+);
+
+TextStyle cancelTextStyle = TextStyle(
+  fontFamily: _secondaryFont,
+  color: greenButtonColor,
+  fontSize: 13,
+);
+
+TextStyle logoutTextStyle = TextStyle(
+  fontFamily: _tertiaryFont,
+  color: logoutColor,
+  fontSize: 13,
 );

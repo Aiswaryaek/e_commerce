@@ -1,5 +1,5 @@
 class TrendingProducts {
-  String id;
+  int? id;
   String name;
   String image;
   dynamic price;
