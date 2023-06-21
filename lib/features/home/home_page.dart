@@ -10,7 +10,6 @@ import '../../models/cart_model.dart';
 import '../../models/trending_products_model.dart';
 import '../../styles/colors.dart';
 import '../../styles/text_style.dart';
-import '../../utilities/shared_preferences.dart';
 import '../../widgets/main_app_bar.dart';
 
 class HomePage extends StatefulWidget {

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import '../../models/cart_model.dart';
 import '../../models/trending_products_model.dart';
 import '../../styles/text_style.dart';
-import '../../utilities/shared_preferences.dart';
 import '../../widgets/app_bar.dart';
 import '../checkout/checkout_screen.dart';
 
@@ -61,19 +60,7 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  setCartData(_cart) async {
-    dynamic data = jsonEncode(_cart);
-    await setValue('cart', data);
-    getCartData();
-  }
 
-  getCartData() async {
-    dynamic data = await getValue('cart');
-    dynamic cartData = jsonDecode(data) ?? [];
-    setState(() {
-      widget.cartList = cartData.cast<Cart>();
-    });
-  }
 
   double _getTotalItemPrice(id, qty) {
     int index = widget.optionItems.indexWhere((element) => element.id == id);
